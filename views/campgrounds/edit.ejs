@@ -1,26 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Campground</title>
-</head>
-<body>
-    <h1>Edit Camgpround</h1>
-    <hr>
-    <form action="/campgrounds/<%= campground._id %>?_method=PUT" method="POST">
-        <div>
-            <label for="title">Campground Title</label>
-            <input type="text" name="campground[title]" id="title" placeholder="Title" value="<%= campground.title %> ">
-            <br>
-            <label for="location">Campground Location</label>
-            <input type="text" name="campground[location]" id="location" placeholder="Location" value="<%= campground.location %>" >
-            <br>
-            <button>Update Campground</button>
+<% layout('layouts/boilerplate')%>
+    <div class="row">
+        <h1 class="text-center">Edit Campground</h1>
+        <div class="col-6 offset-3">
+            <form action="/campgrounds/<%=campground._id%>?_method=PUT" method="POST">
+                <div class="mb-3">
+                    <label class="form-label" for="title">Campground Name</label>
+                    <input class="form-control" type="text" id="title" name="campground[title]"
+                        value="<%=campground.title %>" placeholder="Campground ''">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="location">Campground Location</label>
+                    <input class="form-control" type="text" id="location" name="campground[location]"
+                        value="<%=campground.location %>" placeholder="Jakarta, Indonesia">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="image">Campground Image URL</label>
+                    <input class="form-control" type="text" id="image" name="campground[image]"
+                        value="<%=campground.image %>" placeholder="https://www.example.com">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="price">Campground Price</label>
+                    <div class="input-group">
+                        <span class="input-group-text" id="price-label">$</span>
+                        <input type="text" class="form-control" id="price" placeholder="0.00" aria-label="price"
+                            aria-describedby="price-label" name="campground[price]" value="<%=campground.price %>">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="description">Campground Description</label>
+                    <textarea class="form-control" type="text" id="description" name="campground[description]"
+                        placeholder="lorem ipsum"><%= campground.description%></textarea>
+                </div>
+                <div class="mb-3">
+                    <button class="btn btn-outline-info">Update Campground</button>
+                </div>
+            </form>
+            <a href="/campgrounds/<%= campground._id%>">Back To Campground</a>
+
         </div>
-    </form>
-    <hr>
-    <a href="/campgrounds/<%= campground._id %> ">Back to Campground</a>
-</body>
-</html>
+    </div>
