@@ -5,3 +5,4 @@
  2. EJS & EJS Mate
  3. Bootstrap 5
  4. MongoDB and Mongoose
+ 5. JOI Validator
