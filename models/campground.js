@@ -7,6 +7,13 @@ const CampGroundSchema = new Schema({
   price: Number,
   description: String,
   location: String,
+  // getting the reviews schema from the review model
+  reviews: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Review",
+    },
+  ],
 });
 
 module.exports = mongoose.model("CampGround", CampGroundSchema);
