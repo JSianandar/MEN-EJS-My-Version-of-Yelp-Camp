@@ -28,5 +28,17 @@
                     <%= Math.floor(Math.random() * 20) + 1 %> days ago
                 </div>
             </div>
+            <h2>Leave a Review!</h2>
+            <form action="" class="mb-3">
+                <div class="mb-3">
+                    <div class="mb-3">
+                        <label class="form-label" for="rating">Rate Us!</label>
+                        <input class="form-range" type="range" min="1" max="5" name="review[rating]" id="rating">
+                    </div>
+                    <label class="form-label" for="body">Review Us!</label>
+                    <textarea class='form-control' name="review[body]" id="body" cols="30" rows="3"></textarea>
+                </div>
+                <button class="btn btn-success">Submit</button>
+            </form>
         </div>
     </div>
