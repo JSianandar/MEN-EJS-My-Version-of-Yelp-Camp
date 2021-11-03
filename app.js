@@ -8,8 +8,8 @@ const mongoose = require("mongoose");
 const ejsMate = require("ejs-mate");
 // for validation server-side
 const Joi = require("joi");
-// validation of campground using JOI
-const { campgroundSchema } = require("./schemas");
+// validation of campground and reviews using JOI
+const { campgroundSchema, reviewSchema } = require("./schemas");
 // function for handling async errors
 const wrapAsync = require("./utils/wrapAsync");
 // class for displaying message and stataus codes
@@ -18,6 +18,10 @@ const ExpressError = require("./utils/ExpressError");
 const methodOverride = require("method-override");
 // importing the model of the db schema
 const CampGround = require("./models/campground");
+// importing the model of the review schema
+const Review = require("./models/review");
+const { wrap } = require("module");
+const campground = require("./models/campground");
 
 mongoose.connect("mongodb://localhost:27017/yelp-camp", {
   useNewUrlParser: true,
@@ -39,7 +43,7 @@ app.set("views", path.join(__dirname, "views"));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
-
+// middlewares
 const joiValidateCampground = (req, res, next) => {
   const { error } = campgroundSchema.validate(req.body);
   if (error) {
@@ -50,6 +54,16 @@ const joiValidateCampground = (req, res, next) => {
   }
 };
 
+const joiValidateCampgroundReviews = (req, res, next) => {
+  const { error } = reviewSchema.validate(req.body);
+  if (error) {
+    const msg = error.details.map((el) => el.message).join(",");
+    throw new ExpressError(msg, 400);
+  } else {
+    next();
+  }
+};
+// Campground Routes
 app.get("/", (req, res) => {
   res.render("home");
 });
@@ -67,6 +81,7 @@ app.get("/campgrounds/new", (req, res) => {
   res.render("campgrounds/new");
 });
 
+// for creating new campground
 app.post(
   "/campgrounds",
   joiValidateCampground,
@@ -84,7 +99,9 @@ app.post(
 app.get(
   "/campgrounds/:id",
   wrapAsync(async (req, res) => {
-    const campground = await CampGround.findById(req.params.id);
+    const campground = await CampGround.findById(req.params.id).populate(
+      "reviews"
+    );
     res.render("campgrounds/show", { campground });
   })
 );
@@ -115,6 +132,31 @@ app.delete(
     const { id } = req.params;
     await CampGround.findByIdAndDelete(id);
     res.redirect("/campgrounds");
+  })
+);
+// Review Routes
+//make a new review for a specific campground
+app.post(
+  "/campgrounds/:id/reviews",
+  joiValidateCampgroundReviews,
+  wrapAsync(async (req, res) => {
+    const campground = await CampGround.findById(req.params.id);
+    const review = new Review(req.body.review);
+    campground.reviews.push(review);
+    await review.save();
+    await campground.save();
+    res.redirect(`/campgrounds/${campground._id}`);
+  })
+);
+// delete a review from a specific campground
+app.delete(
+  "/campgrounds/:id/reviews/:reviewId",
+  wrapAsync(async (req, res) => {
+    const { id, reviewId } = req.params;
+    // Checking the desired review id to be deleted from the review array
+    await campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
+    await Review.findByIdAndDelete(reviewId);
+    res.redirect(`/campgrounds/${id}`);
   })
 );
 // if no path/url matched then call this
