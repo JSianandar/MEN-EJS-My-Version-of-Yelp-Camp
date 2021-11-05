@@ -10,9 +10,12 @@ const ejsMate = require("ejs-mate");
 const Joi = require("joi");
 // class for displaying message and stataus codes
 const ExpressError = require("./utils/ExpressError");
+// Express session
+const session = require("express-session");
+// Express flash for notifications after we did something
+const flash = require("connect-flash");
 // so we can use PUT and DELETE method
 const methodOverride = require("method-override");
-const { wrap } = require("module");
 
 const campgrounds = require("./routes/campgrounds");
 const reviews = require("./routes/reviews");
@@ -37,7 +40,29 @@ app.set("views", path.join(__dirname, "views"));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
+app.use(express.static(path.join(__dirname, "public")));
 
+// Session configuration
+const sessionConfig = {
+  secret: "thishouldbeabettersecret",
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    //security for the http
+    httpOnly: true,
+    expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+  },
+};
+app.use(session(sessionConfig));
+app.use(flash());
+
+// Middleware for Flash
+app.use((req, res, next) => {
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
+  next();
+});
 // Campground Routes
 app.use("/campgrounds", campgrounds);
 // Review Routes
