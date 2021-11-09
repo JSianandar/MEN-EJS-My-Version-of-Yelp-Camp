@@ -3,25 +3,14 @@ const express = require("express");
 const router = express.Router();
 // function for handling async errors
 const wrapAsync = require("../utils/wrapAsync");
-// class for displaying message and stataus codes
-const ExpressError = require("../utils/ExpressError");
 // importing the model of the db schema
 const CampGround = require("../models/campground");
-// validation of campground and reviews using JOI
-const { campgroundSchema } = require("../schemas");
 // taking auth middleware
-const { isLoggedIn } = require("../middleware");
-
-// Validation middleware
-const joiValidateCampground = (req, res, next) => {
-  const { error } = campgroundSchema.validate(req.body);
-  if (error) {
-    const msg = error.details.map((el) => el.message).join(",");
-    throw new ExpressError(msg, 400);
-  } else {
-    next();
-  }
-};
+const {
+  isLoggedIn,
+  isAuthor,
+  joiValidateCampground,
+} = require("../middleware");
 
 // Campground Routes
 // get all campgrounds
@@ -44,9 +33,9 @@ router.post(
   isLoggedIn,
   joiValidateCampground,
   wrapAsync(async (req, res, next) => {
-    // if (!req.body.campground)
-    //   throw new ExpressError("Invalid Campground Data", 400);
     const campground = new CampGround(req.body.campground);
+    // set the author to be the logged in user
+    campground.author = req.user._id;
     await campground.save();
     req.flash("success", "Successfully made a new campground!");
     res.redirect(`/campgrounds/${campground._id}`);
@@ -57,9 +46,15 @@ router.post(
 router.get(
   "/:id",
   wrapAsync(async (req, res) => {
-    const campground = await CampGround.findById(req.params.id).populate(
-      "reviews"
-    );
+    const campground = await CampGround.findById(req.params.id)
+      .populate({
+        path: "reviews",
+        populate: {
+          path: "author",
+        },
+      })
+      .populate("author");
+    console.log(campground);
     if (!campground) {
       req.flash("error", "This campground is not available");
       return res.redirect("/campgrounds");
@@ -71,8 +66,12 @@ router.get(
 router.get(
   "/:id/edit",
   isLoggedIn,
+  isAuthor,
   wrapAsync(async (req, res) => {
-    const campground = await CampGround.findById(req.params.id);
+    if (!campground) {
+      req.flash("error", "This campground is not available");
+      return res.redirect("/campgrounds");
+    }
     res.render("campgrounds/edit", { campground });
   })
 );
@@ -81,8 +80,8 @@ router.put(
   "/:id",
   joiValidateCampground,
   isLoggedIn,
+  isAuthor,
   wrapAsync(async (req, res) => {
-    const { id } = req.params;
     const campground = await CampGround.findByIdAndUpdate(id, {
       ...req.body.campground,
     });
