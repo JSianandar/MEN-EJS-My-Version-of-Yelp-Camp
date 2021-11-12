@@ -3,41 +3,18 @@ const express = require("express");
 const router = express.Router();
 // function for handling async errors
 const wrapAsync = require("../utils/wrapAsync");
-const User = require("../models/user");
 // passport functionality
 const passport = require("passport");
+//getting users controller
+const users = require("../controllers/users");
 
 // route to go to register page
-router.get("/register", (req, res) => {
-  res.render("users/register");
-});
+router.get("/register", users.getRegisterForm);
 // route to register a new user
-router.post(
-  "/register",
-  wrapAsync(async (req, res) => {
-    // if user hasnt exist yet
-    try {
-      const { email, username, password } = req.body;
-      const user = new User({ email, username });
-      const registeredUser = await User.register(user, password);
-      //login after registered
-      req.login(registeredUser, (err) => {
-        if (err) return next(err);
-      });
-      req.flash("success", "Welcome to Yelp Camp");
-      res.redirect("/campgrounds");
-      // if user already exist
-    } catch (e) {
-      req.flash("error", e.message);
-      res.redirect("register");
-    }
-  })
-);
-
-router.get("/login", (req, res) => {
-  res.render("users/login");
-});
-
+router.post("/register", wrapAsync(users.register));
+// route to render login page
+router.get("/login", users.getLoginForm);
+// route to login as a user
 router.post(
   "/login",
   passport.authenticate("local", {
@@ -45,19 +22,9 @@ router.post(
     failureFlash: true,
     failureRedirect: "/login",
   }),
-  (req, res) => {
-    req.flash("success", "Welcome Back!");
-    // after logging in, you went to the last page be it new or edit campground
-    const redirectUrl = req.session.returnTo || "/campgrounds";
-    delete req.session.returnTo;
-    res.redirect(redirectUrl);
-  }
+  users.login
 );
-
-router.get("/logout", (req, res) => {
-  req.logout();
-  req.flash("success", "Succesfully Logged Out!");
-  res.redirect("/campgrounds");
-});
+// route to logout as a user
+router.get("/logout", users.logout);
 
 module.exports = router;
