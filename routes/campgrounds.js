@@ -14,22 +14,34 @@ const {
 } = require("../middleware");
 
 // Campground Routes
-// get all campgrounds
-router.get("/", wrapAsync(campgrounds.index));
-
+// / routes
+router
+  .route("/")
+  // get all campgrounds
+  .get(wrapAsync(campgrounds.index))
+  // create a new compground
+  .post(
+    isLoggedIn,
+    joiValidateCampground,
+    wrapAsync(campgrounds.createNewCampground)
+  );
 // form for creating new campground
 router.get("/new", isLoggedIn, campgrounds.newCampgroundForm);
+// /:id routes
+router
+  .route("/:id")
+  // get campground by id
+  .get(wrapAsync(campgrounds.showCampgroundById))
+  // update the campground by id
+  .put(
+    joiValidateCampground,
+    isLoggedIn,
+    isAuthor,
+    wrapAsync(campgrounds.editCampgroundById)
+  )
+  // delete a campground by id
+  .delete(isLoggedIn, wrapAsync(campgrounds.deleteCampgroundById));
 
-// for creating new campground
-router.post(
-  "/",
-  isLoggedIn,
-  joiValidateCampground,
-  wrapAsync(campgrounds.createNewCampground)
-);
-
-// get campground by id
-router.get("/:id", wrapAsync(campgrounds.showCampgroundById));
 // get edit page for campground by id
 router.get(
   "/:id/edit",
@@ -37,15 +49,5 @@ router.get(
   isAuthor,
   wrapAsync(campgrounds.editCampgroundForm)
 );
-// update the campground by id
-router.put(
-  "/:id",
-  joiValidateCampground,
-  isLoggedIn,
-  isAuthor,
-  wrapAsync(campgrounds.editCampgroundById)
-);
-// delete a campground by id
-router.delete("/:id", isLoggedIn, wrapAsync(campgrounds.deleteCampgroundById));
 
 module.exports = router;
