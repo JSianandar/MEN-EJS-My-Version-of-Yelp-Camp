@@ -5,6 +5,11 @@ const router = express.Router();
 const campgrounds = require("../controllers/campgrounds");
 // function for handling async errors
 const wrapAsync = require("../utils/wrapAsync");
+// middleware for uploading images
+const multer = require("multer");
+// cloudinary
+const { storage } = require("../cloudinary");
+const upload = multer({ storage });
 
 // taking auth middleware
 const {
@@ -22,9 +27,11 @@ router
   // create a new compground
   .post(
     isLoggedIn,
+    upload.array("image"),
     joiValidateCampground,
     wrapAsync(campgrounds.createNewCampground)
   );
+
 // form for creating new campground
 router.get("/new", isLoggedIn, campgrounds.newCampgroundForm);
 // /:id routes

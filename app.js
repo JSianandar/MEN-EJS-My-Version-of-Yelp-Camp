@@ -1,3 +1,8 @@
+//if we're running in development, require the dotenv package
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
+
 // express server
 const express = require("express");
 // path
