@@ -33,7 +33,6 @@
         />
         <div class="valid-feedback">Acceptable!</div>
       </div>
-      <input type="file" name="image" id="" multiple />
       <!-- <div class="mb-3">
                     <label class="form-label" for="image">Campground Image URL</label>
                     <input class="form-control" type="text" name="campground[image]" id="image"
@@ -74,9 +73,20 @@
         ></textarea>
         <div class="valid-feedback">Acceptable!</div>
       </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="image">Upload Image(s)</label>
+        <input
+          type="file"
+          class="form-control"
+          name="image"
+          id="image"
+          multiple
+        />
+      </div>
       <button class="btn btn-outline-success">Add Campground</button>
     </form>
     <hr />
-    <a href="/campgrounds">All Campgrounds</a>
+    <a href="/campgrounds" class="mb-3">All Campgrounds</a>
   </div>
 </div>

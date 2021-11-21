@@ -1,5 +1,6 @@
 // importing the model of the db schema
 const CampGround = require("../models/campground");
+const { cloudinary } = require("../cloudinary");
 
 // All campgrounds controller method
 
@@ -58,6 +59,24 @@ module.exports.editCampgroundById = async (req, res) => {
   const campground = await CampGround.findByIdAndUpdate(id, {
     ...req.body.campground,
   });
+  // push to the current array of images
+  const imgs = req.files.map((f) => ({
+    url: f.path,
+    filename: f.filename,
+  }));
+  campground.images.push(...imgs);
+  await campground.save();
+  // checking whether the images we ticked are available for deletion
+  if (req.body.deleteImages) {
+    // we delete the files from cloudinary
+    for (let filename of req.body.deleteImages) {
+      await cloudinary.uploader.destroy(filename);
+    }
+    // we delete the files from mongo db by pulling from array
+    await campground.updateOne({
+      $pull: { images: { filename: { $in: req.body.deleteImages } } },
+    });
+  }
   req.flash("success", "Successfully updated campground!");
   res.redirect(`/campgrounds/${campground._id}`);
 };

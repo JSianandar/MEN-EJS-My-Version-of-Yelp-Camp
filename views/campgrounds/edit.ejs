@@ -7,6 +7,7 @@
       method="POST"
       novalidate
       class="validated-form"
+      enctype="multipart/form-data"
     >
       <div class="mb-3">
         <label class="form-label" for="title">Campground Name</label>
@@ -30,19 +31,6 @@
           name="campground[location]"
           value="<%=campground.location %>"
           placeholder="Jakarta, Indonesia"
-          required
-        />
-        <div class="valid-feedback">Acceptable!</div>
-      </div>
-      <div class="mb-3">
-        <label class="form-label" for="image">Campground Image URL</label>
-        <input
-          class="form-control"
-          type="text"
-          id="image"
-          name="campground[image]"
-          value="<%=campground.image %>"
-          placeholder="https://www.example.com"
           required
         />
         <div class="valid-feedback">Acceptable!</div>
@@ -78,14 +66,41 @@
           placeholder="lorem ipsum"
           required
         >
-<%= campground.description%></textarea
+        <%= campground.description%></textarea
         >
         <div class="valid-feedback">Acceptable!</div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="image">Add More Image(s)</label>
+        <input
+          type="file"
+          class="form-control"
+          name="image"
+          id="image"
+          multiple
+        />
+      </div>
+      <div class="mb-3">
+        <% campground.images.forEach(function(img, i) { %>
+        <img src="<%= img.thumbnail %> " class="img-thumbnail" alt="" />
+        <div class="form-check-inline">
+          <input
+            type="checkbox"
+            name="deleteImages[]"
+            id="image-<%= i%>"
+            value="<%= img.filename %>"
+          />
+        </div>
+        <label for="image-<%= i%>">Delete?</label>
+        <% })%>
       </div>
       <div class="mb-3">
         <button class="btn btn-outline-info">Update Campground</button>
       </div>
     </form>
-    <a href="/campgrounds/<%= campground._id%>">Back To Campground</a>
+    <hr />
+    <a href="/campgrounds/<%= campground._id%>" class="mb-3"
+      >Back To Campground</a
+    >
   </div>
 </div>

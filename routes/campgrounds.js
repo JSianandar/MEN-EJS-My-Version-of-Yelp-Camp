@@ -41,9 +41,10 @@ router
   .get(wrapAsync(campgrounds.showCampgroundById))
   // update the campground by id
   .put(
-    joiValidateCampground,
     isLoggedIn,
     isAuthor,
+    upload.array("image"),
+    joiValidateCampground,
     wrapAsync(campgrounds.editCampgroundById)
   )
   // delete a campground by id
