@@ -1,40 +1,63 @@
 <% layout('layouts/boilerplate')%>
-<h1>User Registration</h1>
-<form action="/register" method="POST" class="validated-form" novalidate>
-  <div class="mb-3">
-    <label class="form-label" for="username">Username</label>
-    <input
-      class="form-control"
-      type="text"
-      name="username"
-      id="username"
-      placeholder="Username123"
-      required
-    />
-    <div class="valid-feedback">Acceptable!</div>
+<div class="container d-flex justify-content-center align-items-center mt-5">
+  <div class="row">
+    <div class="col-md-6 offset-md-3 col-xl-4 offset-xl-4">
+      <div class="card shadow">
+        <img
+          src="https://images.unsplash.com/photo-1571863533956-01c88e79957e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1267&q=80"
+          alt=""
+          class="card-img-top"
+        />
+        <div class="card-body">
+          <h5 class="card-title">Register</h5>
+          <hr />
+          <form
+            action="/register"
+            method="POST"
+            class="validated-form"
+            novalidate
+          >
+            <div class="mb-3">
+              <label class="form-label" for="username">Username</label>
+              <input
+                class="form-control"
+                type="text"
+                id="username"
+                name="username"
+                placeholder="Username123"
+                required
+                autofocus
+              />
+              <div class="valid-feedback">Acceptable!</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="email">Email</label>
+              <input
+                class="form-control"
+                type="email"
+                id="email"
+                name="email"
+                placeholder="johndoe@gmail.com"
+                required
+              />
+              <div class="valid-feedback">Acceptable!</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="password">Password</label>
+              <input
+                class="form-control"
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Your password"
+                required
+              />
+              <div class="valid-feedback">Acceptable!</div>
+            </div>
+            <button class="btn btn-primary btn-block">Register</button>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="mb-3">
-    <label class="form-label" for="email">Email Address</label>
-    <input
-      class="form-control"
-      type="email"
-      name="email"
-      id="email"
-      placeholder="johndoe@gmail.com"
-      required
-    />
-    <div class="valid-feedback">Acceptable!</div>
-  </div>
-  <div class="mb-3">
-    <label class="form-label" for="password">Password</label>
-    <input
-      class="form-control"
-      type="password"
-      name="password"
-      id="password"
-      required
-    />
-    <div class="valid-feedback">Acceptable!</div>
-  </div>
-  <button class="btn btn-primary">Register</button>
-</form>
+</div>
