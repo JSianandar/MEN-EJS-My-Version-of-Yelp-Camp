@@ -11,36 +11,50 @@ ImageSchema.virtual("thumbnail").get(function () {
   return this.url.replace("/upload", "/upload/w_200");
 });
 
-const CampGroundSchema = new Schema({
-  title: String,
-  images: [ImageSchema],
-  // for geocoding
-  geometry: {
-    type: {
-      type: String,
-      enum: ["Point"],
-      required: true,
+const opts = { toJSON: { virtuals: true } };
+
+const CampGroundSchema = new Schema(
+  {
+    title: String,
+    images: [ImageSchema],
+    // for geocoding
+    geometry: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        required: true,
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
     },
-    coordinates: {
-      type: [Number],
-      required: true,
-    },
-  },
-  price: Number,
-  description: String,
-  location: String,
-  author: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
-  },
-  // getting the reviews schema from the review model
-  reviews: [
-    {
+    price: Number,
+    description: String,
+    location: String,
+    author: {
       type: Schema.Types.ObjectId,
-      ref: "Review",
+      ref: "User",
     },
-  ],
+    // getting the reviews schema from the review model
+    reviews: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Review",
+      },
+    ],
+  },
+  opts
+);
+
+// make virtual for showing title and campground in cluster and also link in the cluster map
+CampGroundSchema.virtual("properties.popUpMarkup").get(function () {
+  return `
+  <strong><a href="/campgrounds/${this._id}">${this.title}</a></strong>
+  <p>${this.description}</p>
+  `;
 });
+
 // middleware so when we delete a campground, the reviews will also be deleted
 CampGroundSchema.post("findOneAndDelete", async function (doc) {
   if (doc) {
