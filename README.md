@@ -7,3 +7,8 @@
  4. MongoDB and Mongoose
  5. JOI Validator
  6. Express Passport
+ 7. Node.js
+ 8. Cloudinary
+ 9. JsDelivr
+ 10. MapboxGL JS
+ 11. Heroku
