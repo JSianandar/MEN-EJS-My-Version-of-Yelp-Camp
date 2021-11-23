@@ -1,6 +1,11 @@
 // importing the model of the db schema
 const CampGround = require("../models/campground");
+// importing cloudinary
 const { cloudinary } = require("../cloudinary");
+// import geocoding
+const mapBoxToken = process.env.MAPBOX_TOKEN;
+const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
+const geocoder = mbxGeocoding({ accessToken: mapBoxToken });
 
 // All campgrounds controller method
 
@@ -14,7 +19,16 @@ module.exports.newCampgroundForm = (req, res) => {
 };
 
 module.exports.createNewCampground = async (req, res, next) => {
+  // to convert our location to coordinates for geocoding
+  const geoData = await geocoder
+    .forwardGeocode({
+      query: req.body.campground.location,
+      limit: 1,
+    })
+    .send();
   const campground = new CampGround(req.body.campground);
+  // for taking location
+  campground.geometry = geoData.body.features[0].geometry;
   // taking the filename and url to be put in mongodb
   campground.images = req.files.map((f) => ({
     url: f.path,
