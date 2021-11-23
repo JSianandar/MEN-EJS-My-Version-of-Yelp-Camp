@@ -17,6 +17,7 @@ const Joi = require("joi");
 const ExpressError = require("./utils/ExpressError");
 // Express session
 const session = require("express-session");
+
 // Express flash for notifications after we did something
 const flash = require("connect-flash");
 // so we can use PUT and DELETE method
@@ -34,7 +35,12 @@ const campgroundsRoutes = require("./routes/campgrounds");
 const reviewsRoutes = require("./routes/reviews");
 const userRoutes = require("./routes/users");
 
-mongoose.connect("mongodb://localhost:27017/yelp-camp", {
+//MongoDBStore using Connect Mongo for our session
+const MongoDBStore = require("connect-mongo");
+//MONGODB ATLAS
+const dbUrl = "mongodb://localhost:27017/yelp-camp";
+// 'mongodb://localhost:27017/yelp-camp'
+mongoose.connect(dbUrl, {
   useNewUrlParser: true,
   //   useCreateIndex: true,
   useUnifiedTopology: true,
@@ -58,8 +64,19 @@ app.use(express.static(path.join(__dirname, "public")));
 // for sanitizing user supplied data
 app.use(mongoSanitize());
 
+const store = new MongoDBStore({
+  mongoUrl: dbUrl,
+  secret: "thisshouldbeabettersecret",
+  touchAfter: 24 * 60 * 60,
+});
+
+store.on("error", function (e) {
+  console.log("SESSION STORE ERROR", e);
+});
+
 // Session configuration
 const sessionConfig = {
+  store,
   name: "session",
   secret: "thishouldbeabettersecret",
   resave: false,
